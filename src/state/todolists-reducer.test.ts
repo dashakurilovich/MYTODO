@@ -64,7 +64,7 @@ test('correct filter of todolist should be changed', () => {
         { id: todolistId2, title: "What to buy", filter: "all" }
     ]
 
-    const action = changeTodoListFilterAC(todolistId2, newFilter)
+    const action = changeTodoListFilterAC(newFilter, todolistId2)
 
     const endState = todolistsReducer(startState, action);
 
