@@ -1,6 +1,6 @@
 import React from "react"
 import { Provider } from "react-redux"
-import { AppRootState, store } from "../state/store"
+import { AppRootStateType, store } from "../state/store"
 import {combineReducers, createStore} from 'redux'
 import {v1} from 'uuid'
 import { tasksReducer } from "../state/tasks-reducers"
@@ -28,7 +28,7 @@ const initialGlobalState = {
    }
 };
 
-export const storyBookStore = createStore(rootReducer, initialGlobalState as AppRootState);
+export const storyBookStore = createStore(rootReducer, initialGlobalState as AppRootStateType);
 
 export const ReduxStoreProviderDecorator = (storyFn: any) => (
    <Provider
