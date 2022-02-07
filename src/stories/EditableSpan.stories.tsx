@@ -16,7 +16,7 @@ export default {
 const changeCallback = action("Value change")
 
 export const EditableSpanBaseExample = () => {
-  return <EditableSpan title={"Start title"} onChange={changeCallback} />
+  return <EditableSpan value={"Start title"} onChange={changeCallback} />
 }
 
 
