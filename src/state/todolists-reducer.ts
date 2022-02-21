@@ -100,6 +100,8 @@ export const setTodolistsAC = (todolists: Array<TodolistType>): setTodolistsActi
     return { type: 'SET-TODOLISTS', todolists: todolists }
 }
 
+
+
 //thunk
 
 export const fetchTodolistsTC = () => {
