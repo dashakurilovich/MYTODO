@@ -174,8 +174,18 @@ export const removeTaskTC = (todolistId: string, taskId: string) => (dispatch: D
 export const createTaskTC = (todoListId: string, title: string) => (dispatch: Dispatch) => {
     todolistsAPI.createTask(todoListId, title)
         .then((res) => {
-            debugger
             let task = res.data.data.item
             dispatch(addTaskAC(task))
+        })
+}
+
+export const updateTaskStatus = (todolistId: string, taskId: string, status: TaskStatuses) => (dispatch: Dispatch) => {
+
+    const model: any = {}
+
+    todolistsAPI.updateTask(todolistId, taskId, model)
+        .then((res) => {
+             /*    const action = changeTaskStatusAC(id, status, todolistId);
+        dispatch(action); */
         })
 }
