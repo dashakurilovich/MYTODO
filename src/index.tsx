@@ -10,7 +10,7 @@ import AppWithRedux from './AppWithRedux';
 ReactDOM.render(
     <React.StrictMode>
         <Provider store={store}>
-            <AppWithRedux />
+            <App />
         </Provider>
     </React.StrictMode>,
     document.getElementById('root')
