@@ -1,9 +1,10 @@
 import { TasksStateType } from '../App';
 import { v1 } from 'uuid';
 import { AddTodolistActionType, RemoveTodolistActionType, setTodolistsAC, setTodolistsActionType, TodolistDomainType } from './todolists-reducer';
-import { TaskPriorities, TaskStatuses, TaskType, todolistsAPI } from '../api/todolists-api'
+import { TaskPriorities, TaskStatuses, TaskType, todolistsAPI, UpdateTaskModelType } from '../api/todolists-api'
 import { Dispatch } from 'redux';
 import { debug } from 'console';
+import { AppRootStateType } from './store';
 
 export type RemoveTaskActionType = {
     type: 'REMOVE-TASK',
@@ -179,13 +180,33 @@ export const createTaskTC = (todoListId: string, title: string) => (dispatch: Di
         })
 }
 
-export const updateTaskStatus = (todolistId: string, taskId: string, status: TaskStatuses) => (dispatch: Dispatch) => {
+export const updateTaskStatus = (todolistId: string, taskId: string, status: TaskStatuses) => (dispatch: Dispatch, getState: () => AppRootStateType) => {
 
-    const model: any = {}
+    const state = getState()
+    debugger
 
-    todolistsAPI.updateTask(todolistId, taskId, model)
-        .then((res) => {
-             /*    const action = changeTaskStatusAC(id, status, todolistId);
-        dispatch(action); */
-        })
+    const allAppTasks = getState().tasks;
+    const tasksForcClickedTodo = allAppTasks[todolistId]
+    const currentTask = tasksForcClickedTodo.find((t: TaskType) => {
+        return t.id === taskId
+    })
+
+    const updateTask = { ...currentTask, status } as UpdateTaskModelType
+
+    //const model: any = {}
+    if (currentTask) {
+        const model = {
+            deadline: currentTask.deadline,
+            description: currentTask.description,
+            priority: currentTask.priority,
+            startDate: currentTask.startDate,
+            status,
+            title: currentTask.title
+        }
+
+        todolistsAPI.updateTask(todolistId, taskId, model)
+            .then((res) => {
+                dispatch(changeTaskStatusAC(taskId, status, todolistId));
+            })
+    }
 }
