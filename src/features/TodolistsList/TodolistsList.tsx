@@ -84,13 +84,14 @@ export const TodolistsList: React.FC = () => {
                         <Paper style={{padding: '10px'}}>
                             <Todolist
                                 id={tl.id}
+                                filter={tl.filter}
+                                entityStatus={tl.entityStatus}
                                 title={tl.title}
                                 tasks={allTodolistTasks}
                                 removeTask={removeTask}
                                 changeFilter={changeFilter}
                                 addTask={addTask}
                                 changeTaskStatus={changeStatus}
-                                filter={tl.filter}
                                 removeTodolist={removeTodolist}
                                 changeTaskTitle={changeTaskTitle}
                                 changeTodolistTitle={changeTodolistTitle}

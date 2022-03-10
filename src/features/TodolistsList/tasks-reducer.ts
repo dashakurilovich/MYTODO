@@ -2,7 +2,7 @@ import { AddTodolistActionType, RemoveTodolistActionType, SetTodolistsActionType
 import { TaskPriorities, TaskStatuses, TaskType, todolistsAPI, UpdateTaskModelType } from '../../api/todolists-api'
 import { Dispatch } from 'redux'
 import { AppRootStateType } from '../../app/store'
-import { setAppStatusAC, SetAppStatusActionType } from '../../app/app-reducer'
+import { setAppErrorAC, SetAppErrorActionType, setAppStatusAC, SetAppStatusActionType } from '../../app/app-reducer'
 
 const initialState: TasksStateType = {}
 
@@ -72,10 +72,22 @@ export const addTaskTC = (title: string, todolistId: string) => (dispatch: Dispa
     dispatch(setAppStatusAC('loading'))
     todolistsAPI.createTask(todolistId, title)
         .then(res => {
-            dispatch(setAppStatusAC('succeeded'))
-            const task = res.data.data.item
-            const action = addTaskAC(task)
-            dispatch(action)
+            if (res.data.resultCode === 0) {
+                dispatch(setAppStatusAC('succeeded'))
+                dispatch(addTaskAC(res.data.data.item))
+            } else {
+                //dispatch(setAppErrorAC(res.data.messages.length ? res.data.messages[0] : 'Unknown error  '))
+
+                if (res.data.messages.length) {
+                    dispatch(setAppErrorAC(res.data.messages[0]))
+                } else {
+                    dispatch(setAppErrorAC('Unknown error  '))
+                }
+
+                dispatch(setAppStatusAC('failed'))
+
+            }
+
         })
 }
 export const updateTaskTC = (taskId: string, domainModel: UpdateDomainTaskModelType, todolistId: string) =>
@@ -100,7 +112,7 @@ export const updateTaskTC = (taskId: string, domainModel: UpdateDomainTaskModelT
         dispatch(setAppStatusAC('loading'))
         todolistsAPI.updateTask(todolistId, taskId, apiModel)
             .then(res => {
-            dispatch(setAppStatusAC('succeeded'))
+                dispatch(setAppStatusAC('succeeded'))
                 const action = updateTaskAC(taskId, domainModel, todolistId)
                 dispatch(action)
             })
@@ -127,3 +139,4 @@ type ActionsType =
     | SetTodolistsActionType
     | ReturnType<typeof setTasksAC>
     | SetAppStatusActionType
+    | SetAppErrorActionType
