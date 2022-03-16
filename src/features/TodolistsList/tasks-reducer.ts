@@ -3,6 +3,8 @@ import { TaskPriorities, TaskStatuses, TaskType, todolistsAPI, UpdateTaskModelTy
 import { Dispatch } from 'redux'
 import { AppRootStateType } from '../../app/store'
 import { setAppErrorAC, SetAppErrorActionType, setAppStatusAC, SetAppStatusActionType } from '../../app/app-reducer'
+import { AxiosError } from 'axios'
+import { handleServerAppError, handleServerNetworkError } from '../../utils/error-utils'
 
 const initialState: TasksStateType = {}
 
@@ -76,18 +78,11 @@ export const addTaskTC = (title: string, todolistId: string) => (dispatch: Dispa
                 dispatch(setAppStatusAC('succeeded'))
                 dispatch(addTaskAC(res.data.data.item))
             } else {
-                //dispatch(setAppErrorAC(res.data.messages.length ? res.data.messages[0] : 'Unknown error  '))
-
-                if (res.data.messages.length) {
-                    dispatch(setAppErrorAC(res.data.messages[0]))
-                } else {
-                    dispatch(setAppErrorAC('Unknown error  '))
-                }
-
-                dispatch(setAppStatusAC('failed'))
-
+                handleServerAppError(dispatch, res.data)
             }
-
+        })
+        .catch((err: AxiosError) => {
+            handleServerNetworkError(dispatch, err.message)
         })
 }
 export const updateTaskTC = (taskId: string, domainModel: UpdateDomainTaskModelType, todolistId: string) =>
