@@ -2,6 +2,7 @@ import { Dispatch } from 'redux'
 import { authAPI, LoginParamsType } from '../../../api/todolists-api'
 import { SetAppErrorActionType, setAppStatusAC, SetAppStatusActionType } from '../../../app/app-reducer'
 import { handleServerAppError, handleServerNetworkError } from '../../../utils/error-utils'
+import { ClearDataActionType, clearTodosDataAC } from '../todolists-reducer'
 
 
 const initialState = {
@@ -23,11 +24,9 @@ export const setIsLoggedInAC = (value: boolean) =>
 
 // thunks
 export const loginTC = (data: LoginParamsType) => (dispatch: Dispatch<ActionsType>) => {
-    debugger
     dispatch(setAppStatusAC('loading'))
     authAPI.login(data)
         .then(res => {
-            debugger
             if (res.data.resultCode === 0) {
                 dispatch(setIsLoggedInAC(true))
                 dispatch(setAppStatusAC('succeeded'))
@@ -40,5 +39,22 @@ export const loginTC = (data: LoginParamsType) => (dispatch: Dispatch<ActionsTyp
         })
 }
 
+export const logoutTC = () => (dispatch: Dispatch<ActionsType>) => {
+    dispatch(setAppStatusAC('loading'))
+    authAPI.logout()
+        .then(res => {
+            if (res.data.resultCode === 0) {
+                dispatch(setIsLoggedInAC(false))
+                dispatch(setAppStatusAC('succeeded'))
+                dispatch(clearTodosDataAC())
+            } else {
+                handleServerAppError(res.data, dispatch);
+            }
+        })
+        .catch((error) => {
+            handleServerNetworkError(error, dispatch)
+        })
+}
+
 // types
-type ActionsType = ReturnType<typeof setIsLoggedInAC> | SetAppStatusActionType | SetAppErrorActionType
+type ActionsType = ReturnType<typeof setIsLoggedInAC> | SetAppStatusActionType | SetAppErrorActionType | ClearDataActionType

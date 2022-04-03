@@ -16,6 +16,7 @@ import { ErrorSnackbar } from '../components/ErrorSnackbar/ErrorSnackbar'
 import { Login } from '../features/TodolistsList/Login/Login'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { CircularProgress } from '@mui/material'
+import { logoutTC } from '../features/TodolistsList/Login/authReduce'
 
 type PropsType = {
     demo?: boolean
@@ -25,13 +26,17 @@ function App({ demo = false }: PropsType) {
 
     const status = useSelector<AppRootStateType, RequestStatusType>((state) => state.app.status)
     const isInitialized = useSelector<AppRootStateType, boolean>((state) => state.app.isInitialized)
-    const isLoggedIn = useSelector<AppRootStateType, boolean>( state => state.auth.isLoggedIn)
+    const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
 
     const dispatch = useDispatch()
 
     useEffect(() => {
         dispatch(initializeAppTC())
     }, [])
+
+    const logoutHandler = () => {
+        dispatch(logoutTC())
+    }
 
     if (!isInitialized) {
         return <div
@@ -52,7 +57,7 @@ function App({ demo = false }: PropsType) {
                     <Typography variant="h6">
                         News
                     </Typography>
-                    <Button color="inherit">Logout</Button>
+                    {isLoggedIn && <Button color="inherit" onClick={logoutHandler}>Logout</Button>}
                 </Toolbar>
                 {status === 'loading' && <LinearProgress />}
             </AppBar>
