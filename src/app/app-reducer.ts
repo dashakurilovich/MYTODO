@@ -1,3 +1,4 @@
+import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { Dispatch } from "redux"
 import { authAPI } from "../api/todolists-api"
 import { setIsLoggedInAC } from "../features/TodolistsList/Login/authReduce"
@@ -8,18 +9,23 @@ const initialState: InitialStateType = {
     isInitialized: false
 }
 
-export const appReducer = (state: InitialStateType = initialState, action: ActionsType): InitialStateType => {
-    switch (action.type) {
-        case 'APP/SET-STATUS':
-            return { ...state, status: action.status }
-        case 'APP/SET-ERROR':
-            return { ...state, error: action.error }
-        case 'APP/SET-ISINITIALIZED':
-            return { ...state, isInitialized: action.isInitialized }
-        default:
-            return { ...state }
+const slice = createSlice({
+    name: 'app',
+    initialState: initialState,
+    reducers: {
+        setAppErrorAC: (state, action: PayloadAction<{ error: string | null }>) => {
+            state.error = action.payload.error
+        },
+        setAppStatusAC: (state, action: PayloadAction<{ status: RequestStatusType }>) => {
+            state.status = action.payload.status
+        },
+        setIsInitializedAC: (state, action: PayloadAction<{ isInitialized: boolean }>) => {
+            state.isInitialized = action.payload.isInitialized
+        }
+
     }
-}
+})
+export const appReducer = slice.reducer
 
 export type RequestStatusType = 'idle' | 'loading' | 'succeeded' | 'failed'
 export type InitialStateType = {
@@ -30,23 +36,21 @@ export type InitialStateType = {
     isInitialized: boolean
 }
 
-export const setAppErrorAC = (error: string | null) => ({ type: 'APP/SET-ERROR', error } as const)
-export const setAppStatusAC = (status: RequestStatusType) => ({ type: 'APP/SET-STATUS', status } as const)
-
-export const setIsInitializedAC = (isInitialized: boolean) => ({ type: 'APP/SET-ISINITIALIZED', isInitialized } as const)
-
+export const setAppErrorAC = slice.actions.setAppErrorAC
+export const setAppStatusAC = slice.actions.setAppStatusAC
+export const setIsInitializedAC = slice.actions.setIsInitializedAC
 
 export const initializeAppTC = () => (dispatch: Dispatch) => {
     authAPI.me()
         .then(res => {
             debugger
             if (res.data.resultCode === 0) {
-                dispatch(setIsLoggedInAC(true));
+                dispatch(setIsLoggedInAC({ value: true }));
             } else {
             }
         })
         .finally(() => {
-            dispatch(setIsInitializedAC(true))
+            dispatch(setIsInitializedAC({ isInitialized: true }))
         })
 }
 

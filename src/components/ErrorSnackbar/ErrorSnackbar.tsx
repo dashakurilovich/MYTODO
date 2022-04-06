@@ -21,12 +21,12 @@ export function ErrorSnackbar() {
         if (reason === 'clickaway') {
             return;
         }
-        dispatch(setAppErrorAC(null))
+        dispatch(setAppErrorAC({ error: null }))
     };
 
     return (
         <Snackbar open={error !== null} autoHideDuration={6000} onClose={handleClose}>
-            <Alert onClose={handleClose} severity="error" sx={{width: '100%'}}>
+            <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
                 {error}
             </Alert>
         </Snackbar>
