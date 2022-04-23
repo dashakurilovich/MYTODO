@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import './App.css'
 import { TodolistsList } from '../features/TodolistsList/TodolistsList'
 import { useDispatch, useSelector } from 'react-redux'
@@ -31,12 +31,14 @@ function App({ demo = false }: PropsType) {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        dispatch(initializeAppTC())
+        if (!demo) {
+            dispatch(initializeAppTC())
+        }
     }, [])
 
-    const logoutHandler = () => {
+    const logoutHandler = useCallback(() => {
         dispatch(logoutTC())
-    }
+    }, [])
 
     if (!isInitialized) {
         return <div
