@@ -45,7 +45,7 @@ export const authAPI = {
     },
     logout() {
         return instance.delete<ResponseType>('auth/login')
-    } 
+    }
 }
 
 
@@ -69,10 +69,12 @@ export type TodolistType = {
     addedDate: string
     order: number
 }
+export type FieldErrorType = { field: string; error: string }
+
 export type ResponseType<D = {}> = {
     resultCode: number
     messages: Array<string>
-    fieldsErrors: Array<string>
+    fieldsErrors?: Array<FieldErrorType>
     data: D
 }
 
