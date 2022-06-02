@@ -9,13 +9,12 @@ import { ClearDataActionType, clearTodosDataAC } from '../todolists-reducer'
 
 export const loginTC = createAsyncThunk<undefined, LoginParamsType, {
     rejectValue: { errors: Array<string>, fieldsErrors?: Array<FieldErrorType> }
-}>('auth/login', async (param, thunkAPI) => {
+}>('auth/login', async (param, thunkAPI) =>  {
     thunkAPI.dispatch(setAppStatusAC({ status: 'loading' }))
     try {
         const res = await authAPI.login(param);
         if (res.data.resultCode === 0) {
             thunkAPI.dispatch(setAppStatusAC({ status: 'succeeded' }))
-            return;
         } else {
             handleServerAppError(res.data, thunkAPI.dispatch);
             return thunkAPI.rejectWithValue({ errors: res.data.messages, fieldsErrors: res.data.fieldsErrors })
@@ -25,8 +24,26 @@ export const loginTC = createAsyncThunk<undefined, LoginParamsType, {
         return thunkAPI.rejectWithValue({ errors: [error], fieldsErrors: undefined })
     }
 })
+export const logoutTC = createAsyncThunk('auth/logout', async (param, thunkAPI) =>  {
+    thunkAPI.dispatch(setAppStatusAC({ status: 'loading' }))
+    try {
+        const res = await authAPI.logout()
+        if (res.data.resultCode === 0) {
+            thunkAPI.dispatch(setAppStatusAC({ status: 'succeeded' }))
+            thunkAPI.dispatch(clearTodosDataAC({}))
+        } else {
+            handleServerAppError(res.data, thunkAPI.dispatch);
+            return thunkAPI.rejectWithValue({})
+        }
+    }
+    catch
+    (error: any) {
+        handleServerNetworkError(error, thunkAPI.dispatch)
+        return thunkAPI.rejectWithValue({})
+    }
+})
 
-export const logoutTC = createAsyncThunk('auth/logout', async (param, thunkAPI) => {
+export const logoutTC_ = createAsyncThunk('auth/logout', async (param, thunkAPI) => {
     thunkAPI.dispatch(setAppStatusAC({ status: 'loading' }))
     try {
         const res = await authAPI.logout()

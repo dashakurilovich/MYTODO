@@ -6,6 +6,55 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 const initialState: Array<TodolistDomainType> = []
 
+export const fetchTodolistsTC = () => {
+    return (dispatch: any) => {
+        dispatch(setAppStatusAC({ status: 'loading' }))
+        todolistsAPI.getTodolists()
+            .then((res) => {
+                dispatch(setTodolistsAC({ todolists: res.data }))
+                dispatch(setAppStatusAC({ status: 'succeeded' }))
+                return res.data
+            })
+            .then((todoS: any) => {
+                todoS.forEach((tl: any) => {
+                    dispatch(fetchTasksTC(tl.id))
+                });
+            })
+    }
+}
+export const removeTodolistTC = (todolistId: string) => {
+    return (dispatch: Dispatch) => {
+        //изменим глобальный статус приложения, чтобы вверху полоса побежала
+        dispatch(setAppStatusAC({ status: 'loading' }))
+        //изменим статус конкретного тудулиста, чтобы он мог задизеблить что надо
+        dispatch(changeTodolistEntityStatusAC({ id: todolistId, status: 'loading' }))
+        todolistsAPI.deleteTodolist(todolistId)
+            .then((res) => {
+                dispatch(removeTodolistAC({ id: todolistId }))
+                //скажем глобально приложению, что асинхронная операция завершена
+                dispatch(setAppStatusAC({ status: 'succeeded' }))
+            })
+    }
+}
+export const addTodolistTC = (title: string) => {
+    return (dispatch: Dispatch) => {
+        dispatch(setAppStatusAC({ status: 'loading' }))
+        todolistsAPI.createTodolist(title)
+            .then((res) => {
+                dispatch(addTodolistAC({ todolist: res.data.data.item }))
+                dispatch(setAppStatusAC({ status: 'succeeded' }))
+            })
+    }
+}
+export const changeTodolistTitleTC = (id: string, title: string) => {
+    return (dispatch: Dispatch) => {
+        todolistsAPI.updateTodolist(id, title)
+            .then((res) => {
+                dispatch(changeTodolistTitleAC({ id: id, title }))
+            })
+    }
+}
+
 const slice = createSlice({
     name: 'todolists',
     initialState: initialState,
@@ -87,54 +136,7 @@ export const clearTodosDataAC = () => ({ type: 'CLEAR-DATA' } as const) */
 
 
 // thunks
-export const fetchTodolistsTC = () => {
-    return (dispatch: any) => {
-        dispatch(setAppStatusAC({ status: 'loading' }))
-        todolistsAPI.getTodolists()
-            .then((res) => {
-                dispatch(setTodolistsAC({ todolists: res.data }))
-                dispatch(setAppStatusAC({ status: 'succeeded' }))
-                return res.data
-            })
-            .then((todoS: any) => {
-                todoS.forEach((tl: any) => {
-                    dispatch(fetchTasksTC(tl.id))
-                });
-            })
-    }
-}
-export const removeTodolistTC = (todolistId: string) => {
-    return (dispatch: Dispatch) => {
-        //изменим глобальный статус приложения, чтобы вверху полоса побежала
-        dispatch(setAppStatusAC({ status: 'loading' }))
-        //изменим статус конкретного тудулиста, чтобы он мог задизеблить что надо
-        dispatch(changeTodolistEntityStatusAC({ id: todolistId, status: 'loading' }))
-        todolistsAPI.deleteTodolist(todolistId)
-            .then((res) => {
-                dispatch(removeTodolistAC({ id: todolistId }))
-                //скажем глобально приложению, что асинхронная операция завершена
-                dispatch(setAppStatusAC({ status: 'succeeded' }))
-            })
-    }
-}
-export const addTodolistTC = (title: string) => {
-    return (dispatch: Dispatch) => {
-        dispatch(setAppStatusAC({ status: 'loading' }))
-        todolistsAPI.createTodolist(title)
-            .then((res) => {
-                dispatch(addTodolistAC({ todolist: res.data.data.item }))
-                dispatch(setAppStatusAC({ status: 'succeeded' }))
-            })
-    }
-}
-export const changeTodolistTitleTC = (id: string, title: string) => {
-    return (dispatch: Dispatch) => {
-        todolistsAPI.updateTodolist(id, title)
-            .then((res) => {
-                dispatch(changeTodolistTitleAC({ id: id, title }))
-            })
-    }
-}
+
 
 // types
 export type AddTodolistActionType = ReturnType<typeof addTodolistAC>;
